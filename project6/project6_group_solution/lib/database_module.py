@@ -3,6 +3,8 @@
 
 import psycopg2
 import yaml
+import re
+
 
 ### TO DO: abstract the error handling to function. The Return from a select or insert will be the sticky wicket.
 
@@ -149,10 +151,10 @@ def execute_sql_statement ( sql_select, location = 'remote'):
 	"""
 	This function will return run an arbitrary SQL select command.
 	"""
-	if  re.search('^[select]', sql_select.lower()) and not re.search(';(?!$)',sql_select):
-	    print "OK"
-	else:
-	    raise ValueError('The SELECT statment is not valid: {}'.format(sql_select))
+#	if  re.search('^[select]', sql_select.lower()) and not re.search(';(?!$)',sql_select):
+#	    print "OK"
+#	else:
+#	    raise ValueError('The SELECT statment is not valid: {}'.format(sql_select))
 
 	try:
 	    connection, cursor = connect_to_postgres(location)
