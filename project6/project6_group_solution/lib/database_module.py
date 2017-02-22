@@ -128,7 +128,7 @@ def connect_to_postgres (location = 'remote'):
 #TO DO: add credential file support as a param for the function call.
 
 
-    with open('Database_credentials', 'r') as f:
+    with open('data/credentials.yaml', 'r') as f:
         credentials =  yaml.load(f) 
     
     try:
@@ -144,3 +144,127 @@ def connect_to_postgres (location = 'remote'):
         except:
             print "No Database is available"
             pass 
+
+def execute_sql_statement ( sql_select, location = 'remote'):
+	"""
+	This function will return run an arbitrary SQL select command.
+	"""
+	if  re.search('^[select]', sql_select.lower()) and not re.search(';(?!$)',sql_select):
+	    print "OK"
+	else:
+	    raise ValueError('The SELECT statment is not valid: {}'.format(sql_select))
+
+	try:
+	    connection, cursor = connect_to_postgres(location)
+	    cursor.execute(sql_select)
+	    returned_cate = cursor.fetchall()
+	    connection.commit()
+	    cursor.close()
+	    connection.close()
+	    return returned_cate	
+	except psycopg2.Error as e:
+	    connection.rollback()
+	    cursor.close()
+	    connection.close()
+	    return e.pgerror
+
+def select_all_page_vectors ( location = 'remote'):
+	"""
+	This function will return all page vectors, and page_ids.
+	"""
+	select_page_vectors_sql = u"""
+    	SELECT * FROM page_vec
+    	"""
+
+	try:
+	    connection, cursor = connect_to_postgres(location)
+	    cursor.execute(select_page_vectors_sql)
+	    page_vectors = cursor.fetchall()
+	    connection.commit()
+	    cursor.close()
+	    connection.close()
+	    return page_vectors	
+	except psycopg2.Error as e:
+	    connection.rollback()
+	    cursor.close()
+	    connection.close()
+	    return e.pgerror
+
+def select_page_vectors ( page_ids, location = 'remote'):
+	"""
+	This function will return page vectors that have a pagid in the list 'page_ids'.  
+	Set the location string to select the database to be used.
+	"""
+	if len(page_ids) ==1:
+		page_ids = page_ids *2
+	page_ids = tuple(page_ids)  #converts the list 'page_ids' into a format the SQL likes.
+	
+	select_page_vectors_sql = u"""
+	    SELECT DISTINCT page_id, page_vec
+	    FROM page_vec
+	    WHERE page_id IN {};
+	    """.format(page_ids)
+	try:
+	    connection, cursor = connect_to_postgres(location)
+	    cursor.execute(select_page_vectors_sql)
+	    returned_pages = cursor.fetchall()
+	    connection.commit()
+	    cursor.close()
+	    connection.close()
+	    return returned_pages
+	except psycopg2.Error as e:
+	    connection.rollback()
+	    cursor.close()
+	    connection.close()
+    	return e.pgerror
+
+
+def select_all_category_vectors ( location = 'remote'):
+	"""
+	This function will return all category vectors, and category_ids.
+	"""
+	select_category_vectors_sql = u"""
+    	SELECT * FROM cate_vec
+    	"""
+
+	try:
+	    connection, cursor = connect_to_postgres(location)
+	    cursor.execute(select_category_vectors_sql)
+	    category_vectors = cursor.fetchall()
+	    connection.commit()
+	    cursor.close()
+	    connection.close()
+	    return category_vectors	
+	except psycopg2.Error as e:
+	    connection.rollback()
+	    cursor.close()
+	    connection.close()
+	    return e.pgerror
+
+def select_category_vectors ( cagetgory_ids , location = 'remote'):
+	"""
+	This function will return category vectors that have a category id in the list 'categoru_ids'.  
+	Set the location string to select the database to be used.
+	"""
+	if len(cagetgory_ids) ==1:
+		cagetgory_ids = cagetgory_ids *2
+	cagetgory_ids = tuple(cagetgory_ids)  #converts the list 'categoru_ids' into a format the SQL likes.
+	
+	select_category_vectors_sql = u"""
+	    SELECT DISTINCT category_id, cate_vec
+	    FROM cate_vec
+	    WHERE category_id IN {};
+	    """.format(cagetgory_ids)
+	try:
+	    connection, cursor = connect_to_postgres(location)
+	    cursor.execute(select_category_vectors_sql)
+	    returned_vectors = cursor.fetchall()
+	    connection.commit()
+	    cursor.close()
+	    connection.close()
+	    return returned_vectors
+	except psycopg2.Error as e:
+	    connection.rollback()
+	    cursor.close()
+	    connection.close()
+    	return e.pgerror
