@@ -1,0 +1,71 @@
+Problems with the solution provide by the teams.
+1. Values passed from module to module were not perfectly aligned.  The modules can be brought refactored to be more efficient.
+
+2. The downloads could not effectively handle categories that reached the maximum number of return from the api.  
+
+3. The model is seems very large for the amount of information included. For example, when the raw text was 29MB, the model is 410 MB.
+
+4. Using a Postgres database, single or double quotes (‘ or ` or “) can cause problems.  Moving to a noSQL database may improve this situation.
+
+5. A progress bar would be nice to have for some of the longer processes.
+
+6. Lemmatize!!
+
+7. The stop words being used need to be examined, and how the model applies the cut off for features.  Is the dropped features relevant.
+
+8. Category prediction is really poor.  Matching on the corpus of a category is not being effective.  t-SNE might be an option or average over the kNN for a many neighbors.
+
+9. Rewrite Search.py at work from Command line
+
+10. Recurse over subcategories.  Make pages members of parent and sub-categories.
+
+11. Document the words for vectorization.
+
+12. API
+
+13. Web interface.
+
+14. Generalize to unlabeled categories?
+
+15. How to load the vectorizer from redis?
+
+16. Update the vectorizer with diffs/rsync in redis? Or just overwrite? Or memcache?
+
+17. Check times, especially downloading, encoding and database reads.
+
+18. Suppress outputs/add verbose modes.
+
+19. Refactor database module. abstract or remove the error handling.
+
+20. Build docker then docker swarm. 
+
+21. Add rq-montioring.and rq-dashboard.
+
+22. Docker compose = make the system
+
+23. Docker swarm, many machines feeding a main docker client
+
+24. Check if search model works better with string or list.
+
+25. Grid search models, SVD components plot vs accuracy of test set to be categorized. Maybe use subcategories as test data.
+
+26. Plot model creation time vs. 
+
+27. SGD for categorization, or Xgboost.
+
+28. Test 2-grams or 3-grams.
+
+29. Put progress bar on build_model.py
+
+30. Add hash/guid for category
+
+31. Add other users to Postgres db in docker
+
+32. Docker compose?
+
+33. Get project 6 to git hub, 
+
+34. Remove empty categories.
+
+
+
