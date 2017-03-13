@@ -43,7 +43,7 @@ To Do: roll my own image with external volume and utilize docer compose.
 
 For the most part, this is has been resolved.  I have a nifty command line tool that will read a yaml file or arguments and try to search for those as categories.  Also, the comand line tool can write to different database locations, like the local computer or AWS.
 
-The main problem with the data acquisition is that is it is slow. The command tool doesn't| report it's progress or estimated time to completion.  I've added a progress bar.  It called tqdm.  I highly recommend it.  It decorates any iterator and creates a progress bar in a notebook, terminal or a gui.  It also estimates the time to completion.  
+The main problem with the data acquisition is that is it is slow. The command tool doesn't report it's progress or estimated time to completion.  I've added a progress bar.  It called tqdm.  I highly recommend it.  It decorates any iterator and creates a progress bar in a notebook, terminal or a gui.  It also estimates the time to completion.  
 
 **Problem 5. Network bottleneck**. 
 
