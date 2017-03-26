@@ -6,9 +6,27 @@ import yaml
 import re
 
 
-### TO DO: abstract the error handling to function. The Return from a select or insert will be the sticky wicket.
+### TO DO: abstract the error handling to function. 
+###The Return from a select or insert will be the sticky wicket.
 
-def Execute_SQL_Statement(sql):
+###Error handling code
+#	try:
+#	    connection, cursor = connect_to_postgres(location)
+#	    cursor.execute(sql)
+#	    cursor.execute(sql)
+#	    connection.commit()
+#	    cursor.close()
+#	    connection.close()
+#	    return "OK"
+#	except psycopg2.Error as e:
+#	    connection.rollback()
+#	    cursor.close()
+#	    connection.close()
+#   	return e.pgerror
+
+
+
+def Execute_SQL_Statement(sql, location = 'remote'):
 	connection, cursor = connect_to_postgres(location)
     cursor.execute(sql)
     if "select" in cursor.statusmessage:
@@ -33,18 +51,8 @@ def create_or_update_category_in_database ( category_id,category_name, location 
         on conflict (category_id) do 
         UPDATE set category_name =excluded.category_name;
         """.format(category_id, category_name)
-	try:
-		connection, cursor = connect_to_postgres(location)
-		cursor.execute(update_sql)
-		connection.commit()
-		cursor.close()
-		connection.close()
-		return "OK"
-	except psycopg2.Error as e:
-		connection.rollback()
-		cursor.close()
-		connection.close()
-		return e.pgerror
+	
+	return Execute_SQL_Statement(update_sql, location)
 
 
 def create_or_update_page_in_database ( page_id, category_id, page_title, page_text,location = 'remote'):
@@ -64,19 +72,10 @@ def create_or_update_page_in_database ( page_id, category_id, page_title, page_t
 		VALUES ({}, {})
 		on conflict do nothing;
     """.format(page_id, category_id)
-	try:
-	    connection, cursor = connect_to_postgres(location)
-	    cursor.execute(insert_page)
-	    cursor.execute(insert_page_cate)
-	    connection.commit()
-	    cursor.close()
-	    connection.close()
-	    return "OK"
-	except psycopg2.Error as e:
-	    connection.rollback()
-	    cursor.close()
-	    connection.close()
-    	return e.pgerror
+	
+
+    return Execute_SQL_Statement(insert_page,location), Execute_SQL_Statement(insert_page_cate,location)
+	
 
 def select_pages ( page_ids = [], location = 'remote'):
 	"""
@@ -90,19 +89,8 @@ def select_pages ( page_ids = [], location = 'remote'):
 	    FROM page
 	    WHERE page_id IN {};
 	    """.format(page_ids)
-	try:
-	    connection, cursor = connect_to_postgres(location)
-	    cursor.execute(select_pages_sql)
-	    returned_pages = cursor.fetchall()
-	    connection.commit()
-	    cursor.close()
-	    connection.close()
-	    return returned_pages
-	except psycopg2.Error as e:
-	    connection.rollback()
-	    cursor.close()
-	    connection.close()
-    	return e.pgerror
+	return Execute_SQL_Statement(select_pages_sql,location)
+
 
 def select_categories_for_page ( page_id , location = 'remote'):
 	"""
@@ -118,19 +106,7 @@ def select_categories_for_page ( page_id , location = 'remote'):
     	WHERE page_cate.page_id = {};
     	""".format(page_id)
 
-	try:
-	    connection, cursor = connect_to_postgres(location)
-	    cursor.execute(select_category_sql)
-	    returned_cate = cursor.fetchall()
-	    connection.commit()
-	    cursor.close()
-	    connection.close()
-	    return returned_cate	
-	except psycopg2.Error as e:
-	    connection.rollback()
-	    cursor.close()
-	    connection.close()
-	    return e.pgerror
+	return Execute_SQL_Statement(select_category_sql, location)
 
 def connect_to_postgres (location = 'remote'):
     """ Open a psycopg2 connection and create a cursor based on a yaml credential file.
@@ -164,24 +140,12 @@ def execute_sql_statement ( sql_select, location = 'remote'):
 	"""
 	This function will return run an arbitrary SQL select command.
 	"""
-#	if  re.search('^[select]', sql_select.lower()) and not re.search(';(?!$)',sql_select):
-#	    print "OK"
-#	else:
-#	    raise ValueError('The SELECT statment is not valid: {}'.format(sql_select))
+	if  sql_select[:5].lower == 'select' and not re.search(';(?!$)',sql_select):
+	    print "OK"
+	else:
+	    raise ValueError('The SELECT statment is not valid: {}'.format(sql_select))
 
-	try:
-		connection, cursor = connect_to_postgres(location)
-		cursor.execute(sql_select)
-		returned_cate = cursor.fetchall()
-		connection.commit()
-		cursor.close()
-		connection.close()
-		return returned_cate	
-	except psycopg2.Error as e:
-	    connection.rollback()
-	    cursor.close()
-	    connection.close()
-	    return e.pgerror
+	return Execute_SQL_Statement(sql_select, location)
 
 def select_all_page_vectors ( location = 'remote'):
 	"""
@@ -191,19 +155,7 @@ def select_all_page_vectors ( location = 'remote'):
     	SELECT * FROM page_vec
     	"""
 
-	try:
-	    connection, cursor = connect_to_postgres(location)
-	    cursor.execute(select_page_vectors_sql)
-	    page_vectors = cursor.fetchall()
-	    connection.commit()
-	    cursor.close()
-	    connection.close()
-	    return page_vectors	
-	except psycopg2.Error as e:
-	    connection.rollback()
-	    cursor.close()
-	    connection.close()
-	    return e.pgerror
+	return Execute_SQL_Statement(select_page_vectors_sql, location)
 
 def select_page_vectors ( page_ids, location = 'remote'):
 	"""
@@ -219,19 +171,8 @@ def select_page_vectors ( page_ids, location = 'remote'):
 	    FROM page_vec
 	    WHERE page_id IN {};
 	    """.format(page_ids)
-	try:
-	    connection, cursor = connect_to_postgres(location)
-	    cursor.execute(select_page_vectors_sql)
-	    returned_pages = cursor.fetchall()
-	    connection.commit()
-	    cursor.close()
-	    connection.close()
-	    return returned_pages
-	except psycopg2.Error as e:
-	    connection.rollback()
-	    cursor.close()
-	    connection.close()
-    	return e.pgerror
+	
+	return Execute_SQL_Statement(select_page_vectors_sql, location)
 
 
 def select_all_category_vectors ( location = 'remote'):
@@ -241,20 +182,8 @@ def select_all_category_vectors ( location = 'remote'):
 	select_category_vectors_sql = u"""
     	SELECT * FROM cate_vec
     	"""
+    return Execute_SQL_Statement(select_category_vectors_sql, location)
 
-	try:
-	    connection, cursor = connect_to_postgres(location)
-	    cursor.execute(select_category_vectors_sql)
-	    category_vectors = cursor.fetchall()
-	    connection.commit()
-	    cursor.close()
-	    connection.close()
-	    return category_vectors	
-	except psycopg2.Error as e:
-	    connection.rollback()
-	    cursor.close()
-	    connection.close()
-	    return e.pgerror
 
 def select_category_vectors ( cagetgory_ids , location = 'remote'):
 	"""
@@ -270,16 +199,5 @@ def select_category_vectors ( cagetgory_ids , location = 'remote'):
 	    FROM cate_vec
 	    WHERE category_id IN {};
 	    """.format(cagetgory_ids)
-	try:
-	    connection, cursor = connect_to_postgres(location)
-	    cursor.execute(select_category_vectors_sql)
-	    returned_vectors = cursor.fetchall()
-	    connection.commit()
-	    cursor.close()
-	    connection.close()
-	    return returned_vectors
-	except psycopg2.Error as e:
-	    connection.rollback()
-	    cursor.close()
-	    connection.close()
-    	return e.pgerror
+	return Execute_SQL_Statement(select_category_vectors_sql, location)	
+	
