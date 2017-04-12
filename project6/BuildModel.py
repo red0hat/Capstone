@@ -58,7 +58,7 @@ def main():
     sql_page_vector = """INSERT INTO page_vec (page_id, page_vector)
             VALUES ({}, ARRAY{});""" 
 
-    for v in tqdm.tqdm(vectors):
+    for v in tqdm.tqdm(vectors,desc = "Building Vectors"):
         cursor.execute(sql_page_vector.format(v[0], list(v[1])))
         connection.commit()
     cursor.close()

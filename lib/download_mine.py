@@ -15,7 +15,6 @@ def parse_pages_from_json(response_json):
 def parse_headings_from_json(response_json):
     return response_json['mobileview']['sections']
 
-
 def wikipedia_get_page(title, category=False):
     """ Get the text of a wikipedia page"""
     
@@ -94,4 +93,15 @@ def fetch_and_store_category(category_name):
     if re.search('Category:',category_name):
             pass
     text = get_text(title)
+    db.create_or_update_page_in_database(page_id,category_number,title,text,db_location)
+
+def fetch_and_store_page_no_vector(title, page_id,category_number,db_location):
+    if re.search('Category:',title):
+            return None
+#    print "Storing", title, page_id
+    text = get_text(page_id)
+    title = title.replace('"','').replace("'","").replace(';','')
+    text = text.replace('"','').replace("'","").replace(';','')
+    if text == '':
+        pass
     db.create_or_update_page_in_database(page_id,category_number,title,text,db_location)

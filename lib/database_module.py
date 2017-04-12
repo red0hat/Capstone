@@ -10,14 +10,13 @@ import re
 
 def Execute_SQL_Statement(sql):
 	connection, cursor = connect_to_postgres(location)
-    cursor.execute(sql)
-    if "select" in cursor.statusmessage:
-    	return_value = cursor.fetchall()
+	cursor.execute(sql)
+	if "select" in cursor.statusmessage:
+		return_value = cursor.fetchall()
 	else:
-    	return_value = cursor.statusmessage
+		return_value = cursor.statusmessage
 	cursor.close()
 	connection.close()
-
 	return return_value
 
 
